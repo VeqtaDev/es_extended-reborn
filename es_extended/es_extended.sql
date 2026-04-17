@@ -60,12 +60,9 @@ CREATE TABLE `jobs` (
 
 INSERT INTO `jobs` VALUES ('unemployed','Sans Emplois');
 
--- Nettoyage / traduction labels jobs
--- Supprime le job banker s'il existe dans une base déjà peuplée
 DELETE FROM `job_grades` WHERE `job_name` = 'banker';
 DELETE FROM `jobs` WHERE `name` = 'banker';
 
--- Traductions et renommages demandés
 UPDATE `jobs` SET `label` = 'Sans Emplois' WHERE `name` = 'unemployed';
 UPDATE `job_grades` SET `label` = 'Sans Emplois' WHERE `job_name` = 'unemployed';
 UPDATE `jobs` SET `label` = 'LSPD' WHERE `name` = 'police';

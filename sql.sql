@@ -60,7 +60,6 @@ CREATE TABLE `jobs` (
 
 INSERT INTO `jobs` VALUES ('unemployed','Sans Emplois');
 
--- French labels + banker cleanup without touching banking tables
 DELETE FROM `job_grades` WHERE `job_name` = 'banker';
 DELETE FROM `jobs` WHERE `name` = 'banker';
 
