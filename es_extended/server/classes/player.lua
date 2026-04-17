@@ -116,6 +116,7 @@
 
 ---@class xPlayer:StaticPlayer
 --- Properties
+---@field uniqueId number            # Unique persistent player ID from database.
 ---@field accounts ESXAccount[]     # Array of the player's accounts.
 ---@field coords table              # Player's coordinates {x, y, z, heading}.
 ---@field group string              # Player permission group.
@@ -136,6 +137,7 @@
 ---@field admin boolean             # Whether the player is an admin.
 
 ---@param playerId number
+---@param uniqueId number|string
 ---@param identifier string
 ---@param ssn string
 ---@param group string
@@ -148,7 +150,7 @@
 ---@param coords vector4|{x: number, y: number, z: number, heading: number}
 ---@param metadata table
 ---@return xPlayer
-function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, inventory, weight, job, loadout, name, coords, metadata)
+function CreateExtendedPlayer(playerId, uniqueId, identifier, ssn, group, accounts, inventory, weight, job, loadout, name, coords, metadata)
     ---@diagnostic disable-next-line: missing-fields
     local self = {} ---@type xPlayer
 
@@ -163,6 +165,7 @@ function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, invent
     self.name = name
     self.playerId = playerId
     self.source = playerId
+    self.uniqueId = tonumber(uniqueId) or 0
     self.variables = {}
     self.weight = weight
     self.maxWeight = Config.MaxWeight
@@ -189,6 +192,7 @@ function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, invent
     local stateBag = Player(self.source).state
     stateBag:set("identifier", self.identifier, false)
     stateBag:set("license", self.license, false)
+    stateBag:set("uniqueId", self.uniqueId, true)
     stateBag:set("job", self.job, true)
     stateBag:set("group", self.group, true)
     stateBag:set("name", self.name, true)
@@ -521,6 +525,10 @@ function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, invent
         return self.source
     end
     self.getPlayerId = self.getSource
+
+    function self.getUniqueId()
+        return self.uniqueId
+    end
 
     function self.getMaxWeight()
         return self.maxWeight

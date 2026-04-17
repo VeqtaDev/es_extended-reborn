@@ -87,26 +87,27 @@ function ESX.RegisterCommand(name, group, cb, allowConsole, suggestion)
                                     err = TranslateCap("commanderror_argumentmismatch_number", k)
                                 end
                             elseif v.type == "player" or v.type == "playerId" then
+                                local xTargetPlayer
                                 local targetPlayer = tonumber(args[k])
 
                                 if args[k] == "me" then
                                     targetPlayer = playerId
+                                    xTargetPlayer = ESX.GetPlayerFromId(playerId)
+                                elseif targetPlayer then
+                                    xTargetPlayer = ESX.GetPlayerFromUniqueId(targetPlayer) or ESX.GetPlayerFromId(targetPlayer)
+                                    if xTargetPlayer then
+                                        targetPlayer = xTargetPlayer.source
+                                    end
                                 end
 
-                                if targetPlayer then
-                                    local xTargetPlayer = ESX.GetPlayerFromId(targetPlayer)
-
-                                    if xTargetPlayer then
-                                        if v.type == "player" then
-                                            newArgs[v.name] = xTargetPlayer
-                                        else
-                                            newArgs[v.name] = targetPlayer
-                                        end
+                                if xTargetPlayer and targetPlayer then
+                                    if v.type == "player" then
+                                        newArgs[v.name] = xTargetPlayer
                                     else
-                                        err = TranslateCap("commanderror_invalidplayerid")
+                                        newArgs[v.name] = targetPlayer
                                     end
                                 else
-                                    err = TranslateCap("commanderror_argumentmismatch_number", k)
+                                    err = TranslateCap("commanderror_invalidplayerid")
                                 end
                             elseif v.type == "string" then
                                 local newArg = tonumber(args[k])
@@ -372,6 +373,23 @@ end
 function ESX.GetPlayerFromId(source)
     return ESX.Players[tonumber(source)]
 end
+
+---@param uniqueId number|string
+---@return xPlayer?
+function ESX.GetPlayerFromUniqueId(uniqueId)
+    return Core.playersByUniqueId[tonumber(uniqueId)]
+end
+
+---@param source number|string
+---@return number?
+function ESX.GetPlayerUniqueId(source)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    return xPlayer and xPlayer.uniqueId or nil
+end
+
+exports("GetPlayerIdUnique", function(source)
+    return ESX.GetPlayerUniqueId(source)
+end)
 
 ---@param identifier string
 ---@return xPlayer?
