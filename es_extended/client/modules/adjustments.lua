@@ -19,6 +19,9 @@ local frameAdjustments = {
     randomVehicleDensity = 1.0,
     vehicleDensity = 1.0,
 }
+local seatShuffleHandlerRegistered = false
+local disableRadioHandlerRegistered = false
+local discordPresenceThreadStarted = false
 
 local function StartFrameAdjustmentsThread()
     if frameAdjustments.started then
@@ -101,7 +104,8 @@ function Adjustments:DisableNPCDrops()
 end
 
 function Adjustments:SeatShuffle()
-    if Config.DisableVehicleSeatShuff then
+    if Config.DisableVehicleSeatShuff and not seatShuffleHandlerRegistered then
+        seatShuffleHandlerRegistered = true
         AddEventHandler("esx:enteredVehicle", function(vehicle, _, seat)
             if seat > -1 then
                 SetPedIntoVehicle(ESX.PlayerData.ped, vehicle, seat)
@@ -255,7 +259,8 @@ function Adjustments:ReplacePlaceholders(text)
 end
 
 function Adjustments:DiscordPresence()
-    if Config.DiscordActivity.appId ~= 0 then
+    if Config.DiscordActivity.appId ~= 0 and not discordPresenceThreadStarted then
+        discordPresenceThreadStarted = true
         CreateThread(function()
             while true do
                 SetDiscordAppId(Config.DiscordActivity.appId)
@@ -283,7 +288,8 @@ function Adjustments:WantedLevel()
 end
 
 function Adjustments:DisableRadio()
-    if Config.RemoveHudComponents[16] then
+    if Config.RemoveHudComponents[16] and not disableRadioHandlerRegistered then
+        disableRadioHandlerRegistered = true
         AddEventHandler("esx:enteredVehicle", function(vehicle, plate, seat, displayName, netId)
             SetVehRadioStation(vehicle,"OFF")
             SetUserRadioControlEnabled(false)
