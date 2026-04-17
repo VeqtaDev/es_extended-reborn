@@ -14,7 +14,7 @@ end
 ---@return nil
 function ESX.SecureNetEvent(name, func)
     local invoker = GetInvokingResource()
-    local invokingResource = invoker and invoker ~= 'unknown' and invoker or 'es_extended'
+    local invokingResource = invoker and invoker:lower() ~= 'unknown' and invoker or GetCurrentResourceName()
     if not invokingResource then
         return
     end

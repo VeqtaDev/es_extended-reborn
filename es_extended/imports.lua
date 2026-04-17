@@ -1,5 +1,9 @@
-ESX = exports["es_extended"]:getSharedObject()
+local ESXResourceName = debug.getinfo(1, "S").source:match("^@@([^/]+)/") or GetCurrentResourceName()
+local escapedESXResourceName = ESXResourceName:gsub("([^%w])", "%%%1")
+
+ESX = exports[ESXResourceName]:getSharedObject()
 ESX.currentResourceName = GetCurrentResourceName()
+ESX.coreResourceName = ESXResourceName
 
 OnPlayerData = function(key, val, last) end
 
@@ -25,7 +29,7 @@ end
 
 if not IsDuplicityVersion() then -- Only register this event for the client
     AddEventHandler("esx:setPlayerData", function(key, val, last)
-        if GetInvokingResource() == "es_extended" then
+        if GetInvokingResource() == ESXResourceName then
             ESX.PlayerData[key] = val
             if OnPlayerData then
                 OnPlayerData(key, val, last)
@@ -92,9 +96,9 @@ if not IsDuplicityVersion() then -- Only register this event for the client
         local module = external[i]
         local path = string.format("client/imports/%s", module[2])
 
-        local file = LoadResourceFile("es_extended", path)
+        local file = LoadResourceFile(ESXResourceName, path)
         if file then
-            local fn, err = load(file, ('@@es_extended/%s'):format(path))
+            local fn, err = load(file, ('@@%s/%s'):format(ESXResourceName, path))
 
             if not fn or err then
                 return error(('\n^1Error importing module (%s)'):format(external[i]))
@@ -112,7 +116,7 @@ else
         return setmetatable({ src = src }, {
             __index = function(self, method)
                 return function(...)
-                    return exports.es_extended:RunStaticPlayerMethod(self.src, method, ...)
+                    return exports[ESXResourceName]:RunStaticPlayerMethod(self.src, method, ...)
                 end
             end
         })
@@ -195,7 +199,7 @@ if GetResourceState("ox_lib") == "missing" then
 
             resource = src:match('^@@([^/]+)/.+')
 
-            if resource and not src:find('^@@es_extended/imports') then
+            if resource and not src:find(('^@@%s/imports'):format(escapedESXResourceName)) then
                 return resource, modName
             end
 

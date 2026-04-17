@@ -10,7 +10,7 @@ ESX.RegisterInteraction = function(name, onPress, condition)
     interactions[name] = {
         condition = condition or function() return true end,
         onPress = onPress,
-        creator = GetInvokingResource() or "es_extended"
+        creator = GetInvokingResource() or GetCurrentResourceName()
     }
 end
 

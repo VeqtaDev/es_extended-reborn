@@ -9,6 +9,7 @@ Callbacks = {}
 Callbacks.requests = {}
 Callbacks.storage = {}
 Callbacks.id = 0
+local thisResourceName = GetCurrentResourceName()
 
 -- =============================================
 -- MARK: Internal Functions
@@ -90,7 +91,7 @@ end
 ---@param ... any
 function ESX.TriggerClientCallback(player, eventName, callback, ...)
     local invokingResource = GetInvokingResource()
-    local invoker = (invokingResource and invokingResource ~= "Unknown") and invokingResource or "es_extended"
+    local invoker = (invokingResource and invokingResource:lower() ~= "unknown") and invokingResource or thisResourceName
 
     Callbacks:Trigger(player, eventName, callback, invoker, ...)
 end
@@ -101,7 +102,7 @@ end
 ---@return ...
 function ESX.AwaitClientCallback(player, eventName, ...)
     local invokingResource = GetInvokingResource()
-    local invoker = (invokingResource and invokingResource ~= "Unknown") and invokingResource or "es_extended"
+    local invoker = (invokingResource and invokingResource:lower() ~= "unknown") and invokingResource or thisResourceName
 
     local p = Callbacks:Trigger(player, eventName, false, invoker, ...)
     if not p then return end
@@ -122,7 +123,7 @@ end
 ---@return nil
 function ESX.RegisterServerCallback(eventName, callback)
     local invokingResource = GetInvokingResource()
-    local invoker = (invokingResource and invokingResource ~= "Unknown") and invokingResource or "es_extended"
+    local invoker = (invokingResource and invokingResource:lower() ~= "unknown") and invokingResource or thisResourceName
 
     Callbacks:Register(eventName, invoker, callback)
 end
