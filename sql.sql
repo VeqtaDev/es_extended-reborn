@@ -105,6 +105,3 @@ INSERT INTO `job_grades` (`id`, `job_name`, `grade`, `name`, `label`, `salary`, 
 (33, 'taxi', 2, 'experimente', 'Experimente', 36, '{}', '{}'),
 (34, 'taxi', 3, 'uber', 'Chauffeur Uber', 48, '{}', '{}'),
 (35, 'taxi', 4, 'boss', 'Chauffeur Principal', 0, '{}', '{}');
-
-DELETE FROM `job_grades` WHERE `job_name` = 'banker';
-DELETE FROM `jobs` WHERE `name` = 'banker';
