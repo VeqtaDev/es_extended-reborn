@@ -370,8 +370,19 @@ end
 if not Config.CustomInventory then
     CreateThread(function()
         while true do
-            local Sleep = 1500
-            local playerCoords = GetEntityCoords(ESX.PlayerData.ped)
+            local Sleep = 2000
+            local ped = ESX.PlayerData.ped
+
+            if not ESX.PlayerLoaded or not ped or not DoesEntityExist(ped) then
+                goto continue
+            end
+
+            if not next(pickups) then
+                goto continue
+            end
+
+            Sleep = 1500
+            local playerCoords = GetEntityCoords(ped)
             local _, closestDistance = ESX.Game.GetClosestPlayer(playerCoords)
 
             for pickupId, pickup in pairs(pickups) do
@@ -383,12 +394,12 @@ if not Config.CustomInventory then
 
                     if distance < 1 then
                         if IsControlJustReleased(0, 38) then
-                            if IsPedOnFoot(ESX.PlayerData.ped) and (closestDistance == -1 or closestDistance > 3) and not pickup.inRange then
+                            if IsPedOnFoot(ped) and (closestDistance == -1 or closestDistance > 3) and not pickup.inRange then
                                 pickup.inRange = true
 
                                 local dict, anim = "weapons@first_person@aim_rng@generic@projectile@sticky_bomb@", "plant_floor"
                                 ESX.Streaming.RequestAnimDict(dict)
-                                TaskPlayAnim(ESX.PlayerData.ped, dict, anim, 8.0, 1.0, 1000, 16, 0.0, false, false, false)
+                                TaskPlayAnim(ped, dict, anim, 8.0, 1.0, 1000, 16, 0.0, false, false, false)
                                 RemoveAnimDict(dict)
                                 Wait(1000)
 
@@ -406,6 +417,8 @@ if not Config.CustomInventory then
                     pickup.inRange = false
                 end
             end
+
+            ::continue::
             Wait(Sleep)
         end
     end)

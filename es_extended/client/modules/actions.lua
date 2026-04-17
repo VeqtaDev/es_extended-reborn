@@ -219,8 +219,13 @@ end
 function Actions:PedLoop()
     CreateThread(function()
         while ESX.PlayerLoaded do
+            local lastPed = ESX.PlayerData.ped
             self:TrackPed()
-            Wait(0)
+            if lastPed ~= ESX.PlayerData.ped then
+                Wait(100)
+            else
+                Wait(400)
+            end
         end
     end)
 end

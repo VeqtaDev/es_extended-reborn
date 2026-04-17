@@ -1,6 +1,6 @@
 local Point = ESX.Class()
 
-local nearby, loop = {}, nil
+local nearby, nearbyCount, loop = {}, 0, nil
 
 function Point:constructor(properties)
 	self.coords = properties.coords
@@ -9,7 +9,11 @@ function Point:constructor(properties)
 	self.leave = properties.leave
 	self.inside = properties.inside
 	self.handle = ESX.CreatePointInternal(properties.coords, properties.distance, properties.hidden, function()
-		nearby[self.handle] = self
+		if not nearby[self.handle] then
+			nearby[self.handle] = self
+			nearbyCount = nearbyCount + 1
+		end
+
 		if self.enter then
 			self:enter()
 		end
@@ -28,11 +32,17 @@ function Point:constructor(properties)
 			end)
 		end
 	end, function()
-		nearby[self.handle] = nil
+		if nearby[self.handle] then
+			nearby[self.handle] = nil
+			nearbyCount = nearbyCount - 1
+		end
+
 		if self.leave then
 			self:leave()
 		end
-		if #nearby == 0 then
+
+		if nearbyCount <= 0 then
+			nearbyCount = 0
 			loop = false
 		end
 	end)

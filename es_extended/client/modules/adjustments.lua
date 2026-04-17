@@ -1,5 +1,81 @@
 Adjustments = {}
 
+local frameAdjustments = {
+    started = false,
+    disableDisplayAmmo = false,
+    disableVehicleRewards = false,
+    useMultipliers = false,
+    applyPedDensity = false,
+    applyScenarioDensity = false,
+    applyAmbientVehicleRange = false,
+    applyParkedVehicleDensity = false,
+    applyRandomVehicleDensity = false,
+    applyVehicleDensity = false,
+    pedDensity = 1.0,
+    scenarioPedDensityInterior = 1.0,
+    scenarioPedDensityExterior = 1.0,
+    ambientVehicleRange = 1.0,
+    parkedVehicleDensity = 1.0,
+    randomVehicleDensity = 1.0,
+    vehicleDensity = 1.0,
+}
+
+local function StartFrameAdjustmentsThread()
+    if frameAdjustments.started then
+        return
+    end
+
+    frameAdjustments.started = true
+
+    CreateThread(function()
+        while true do
+            if ESX.PlayerLoaded and ESX.PlayerData.ped and DoesEntityExist(ESX.PlayerData.ped) then
+                local ped = ESX.PlayerData.ped
+
+                if frameAdjustments.disableDisplayAmmo then
+                    DisplayAmmoThisFrame(false)
+                end
+
+                if frameAdjustments.disableVehicleRewards then
+                    if IsPedInAnyVehicle(ped, false) then
+                        DisablePlayerVehicleRewards(ESX.playerId)
+                    end
+                end
+
+                if frameAdjustments.useMultipliers then
+                    if frameAdjustments.applyPedDensity then
+                        SetPedDensityMultiplierThisFrame(frameAdjustments.pedDensity)
+                    end
+
+                    if frameAdjustments.applyScenarioDensity then
+                        SetScenarioPedDensityMultiplierThisFrame(frameAdjustments.scenarioPedDensityInterior, frameAdjustments.scenarioPedDensityExterior)
+                    end
+
+                    if frameAdjustments.applyAmbientVehicleRange then
+                        SetAmbientVehicleRangeMultiplierThisFrame(frameAdjustments.ambientVehicleRange)
+                    end
+
+                    if frameAdjustments.applyParkedVehicleDensity then
+                        SetParkedVehicleDensityMultiplierThisFrame(frameAdjustments.parkedVehicleDensity)
+                    end
+
+                    if frameAdjustments.applyRandomVehicleDensity then
+                        SetRandomVehicleDensityMultiplierThisFrame(frameAdjustments.randomVehicleDensity)
+                    end
+
+                    if frameAdjustments.applyVehicleDensity then
+                        SetVehicleDensityMultiplierThisFrame(frameAdjustments.vehicleDensity)
+                    end
+                end
+
+                Wait(0)
+            else
+                Wait(500)
+            end
+        end
+    end)
+end
+
 function Adjustments:RemoveHudComponents()
     for i = 1, #Config.RemoveHudComponents do
         if Config.RemoveHudComponents[i] then
@@ -42,19 +118,13 @@ function Adjustments:HealthRegeneration()
 end
 
 function Adjustments:AmmoAndVehicleRewards()
-    CreateThread(function()
-        while true do
-            if Config.DisableDisplayAmmo then
-                DisplayAmmoThisFrame(false)
-            end
+    if not Config.DisableDisplayAmmo and not Config.DisableVehicleRewards then
+        return
+    end
 
-            if Config.DisableVehicleRewards then
-                DisablePlayerVehicleRewards(ESX.playerId)
-            end
-
-            Wait(0)
-        end
-    end)
+    frameAdjustments.disableDisplayAmmo = Config.DisableDisplayAmmo
+    frameAdjustments.disableVehicleRewards = Config.DisableVehicleRewards
+    StartFrameAdjustmentsThread()
 end
 
 function Adjustments:EnablePvP()
@@ -222,17 +292,33 @@ function Adjustments:DisableRadio()
 end
 
 function Adjustments:Multipliers()
-    CreateThread(function()
-        while true do
-            SetPedDensityMultiplierThisFrame(Config.Multipliers.pedDensity)
-            SetScenarioPedDensityMultiplierThisFrame(Config.Multipliers.scenarioPedDensityInterior, Config.Multipliers.scenarioPedDensityExterior)
-            SetAmbientVehicleRangeMultiplierThisFrame(Config.Multipliers.ambientVehicleRange)
-            SetParkedVehicleDensityMultiplierThisFrame(Config.Multipliers.parkedVehicleDensity)
-            SetRandomVehicleDensityMultiplierThisFrame(Config.Multipliers.randomVehicleDensity)
-            SetVehicleDensityMultiplierThisFrame(Config.Multipliers.vehicleDensity)
-            Wait(0)
-        end
-    end)
+    local multipliers = Config.Multipliers
+    frameAdjustments.applyPedDensity = multipliers.pedDensity ~= 1.0
+    frameAdjustments.applyScenarioDensity = multipliers.scenarioPedDensityInterior ~= 1.0 or multipliers.scenarioPedDensityExterior ~= 1.0
+    frameAdjustments.applyAmbientVehicleRange = multipliers.ambientVehicleRange ~= 1.0
+    frameAdjustments.applyParkedVehicleDensity = multipliers.parkedVehicleDensity ~= 1.0
+    frameAdjustments.applyRandomVehicleDensity = multipliers.randomVehicleDensity ~= 1.0
+    frameAdjustments.applyVehicleDensity = multipliers.vehicleDensity ~= 1.0
+    local hasCustomMultipliers = frameAdjustments.applyPedDensity
+        or frameAdjustments.applyScenarioDensity
+        or frameAdjustments.applyAmbientVehicleRange
+        or frameAdjustments.applyParkedVehicleDensity
+        or frameAdjustments.applyRandomVehicleDensity
+        or frameAdjustments.applyVehicleDensity
+
+    if not hasCustomMultipliers then
+        return
+    end
+
+    frameAdjustments.useMultipliers = true
+    frameAdjustments.pedDensity = multipliers.pedDensity
+    frameAdjustments.scenarioPedDensityInterior = multipliers.scenarioPedDensityInterior
+    frameAdjustments.scenarioPedDensityExterior = multipliers.scenarioPedDensityExterior
+    frameAdjustments.ambientVehicleRange = multipliers.ambientVehicleRange
+    frameAdjustments.parkedVehicleDensity = multipliers.parkedVehicleDensity
+    frameAdjustments.randomVehicleDensity = multipliers.randomVehicleDensity
+    frameAdjustments.vehicleDensity = multipliers.vehicleDensity
+    StartFrameAdjustmentsThread()
 end
 
 function Adjustments:Load()
