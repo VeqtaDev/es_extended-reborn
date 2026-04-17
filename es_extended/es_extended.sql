@@ -49,7 +49,7 @@ CREATE TABLE `job_grades` (
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `job_grades` VALUES (1,'unemployed',0,'unemployed','Unemployed',200,'{}','{}');
+INSERT INTO `job_grades` VALUES (1,'unemployed',0,'unemployed','Sans Emplois',200,'{}','{}');
 
 CREATE TABLE `jobs` (
 	`name` VARCHAR(50) NOT NULL,
@@ -58,4 +58,17 @@ CREATE TABLE `jobs` (
 	PRIMARY KEY (`name`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `jobs` VALUES ('unemployed','Unemployed');
+INSERT INTO `jobs` VALUES ('unemployed','Sans Emplois');
+
+-- Nettoyage / traduction labels jobs
+-- Supprime le job banker s'il existe dans une base déjà peuplée
+DELETE FROM `job_grades` WHERE `job_name` = 'banker';
+DELETE FROM `jobs` WHERE `name` = 'banker';
+
+-- Traductions et renommages demandés
+UPDATE `jobs` SET `label` = 'Sans Emplois' WHERE `name` = 'unemployed';
+UPDATE `job_grades` SET `label` = 'Sans Emplois' WHERE `job_name` = 'unemployed';
+UPDATE `jobs` SET `label` = 'LSPD' WHERE `name` = 'police';
+UPDATE `job_grades` SET `label` = 'LSPD' WHERE `job_name` = 'police';
+UPDATE `jobs` SET `label` = 'EMS' WHERE `name` = 'ambulance';
+UPDATE `job_grades` SET `label` = 'EMS' WHERE `job_name` = 'ambulance';
