@@ -2,6 +2,28 @@ ESX.Players = {}
 ESX.Jobs = {}
 ESX.Items = {}
 Core = {}
+local BRANDING_PREFIX = "esx reborn by Veqta 1.1.0"
+
+do
+    local rawPrint = print
+
+    ---@diagnostic disable-next-line: duplicate-set-field
+    print = function(...)
+        local args = { ... }
+        if #args == 0 then
+            return rawPrint(BRANDING_PREFIX)
+        end
+
+        if type(args[1]) == "string" then
+            args[1] = ("%s | %s"):format(BRANDING_PREFIX, args[1])
+        else
+            table.insert(args, 1, ("%s |"):format(BRANDING_PREFIX))
+        end
+
+        return rawPrint(table.unpack(args))
+    end
+end
+
 Core.JobsPlayerCount = {}
 Core.UsableItemsCallbacks = {}
 Core.RegisteredCommands = {}

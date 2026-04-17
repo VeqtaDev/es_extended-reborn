@@ -2,6 +2,14 @@ Core = {}
 Core.Input = {}
 Core.Events = {}
 
+do
+    local _print = print
+    local BRAND_PREFIX = "esx reborn by Veqta 1.1.0"
+    print = function(...)
+        _print(("[%s]"):format(BRAND_PREFIX), ...)
+    end
+end
+
 ESX.PlayerData = {}
 ESX.PlayerLoaded = false
 ESX.playerId = PlayerId()
