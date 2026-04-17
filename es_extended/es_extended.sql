@@ -9,6 +9,7 @@ ALTER DATABASE `es_extended`
 USE `es_extended`;
 
 CREATE TABLE `users` (
+	`id` INT NOT NULL AUTO_INCREMENT,
 	`identifier` VARCHAR(60) NOT NULL,
 	`ssn` VARCHAR(11) NOT NULL,
 	`accounts` LONGTEXT NULL DEFAULT NULL,
@@ -20,7 +21,8 @@ CREATE TABLE `users` (
 	`metadata` LONGTEXT NULL DEFAULT NULL,
 	`position` longtext NULL DEFAULT NULL,
 
-	PRIMARY KEY (`identifier`),
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `unique_identifier` (`identifier`),
 	UNIQUE KEY `unique_ssn` (`ssn`)
 ) ENGINE=InnoDB;
 
