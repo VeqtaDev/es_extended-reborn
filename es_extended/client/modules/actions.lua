@@ -5,6 +5,9 @@ Actions.inVehicle = false
 Actions.enteringVehicle = false
 Actions.inPauseMenu = false
 Actions.currentWeapon = false
+Actions.slowLoopStarted = false
+Actions.pedLoopStarted = false
+Actions.coordsThreadPending = false
 
 function Actions:GetSeatPedIsIn()
     for i = -1, 16 do
@@ -34,6 +37,12 @@ function Actions:SetVehicleStatus()
 end
 
 function Actions:TrackPedCoordsOnce()
+    if self.coordsThreadPending then
+        return
+    end
+
+    self.coordsThreadPending = true
+
     CreateThread(function()
         while not ESX.IsPlayerLoaded() do
             Wait(250)
@@ -52,6 +61,8 @@ function Actions:TrackPedCoordsOnce()
                 return coords
             end
         })
+
+        self.coordsThreadPending = false
     end)
 end
 
@@ -206,6 +217,12 @@ function Actions:TrackWeapon()
 end
 
 function Actions:SlowLoop()
+    if self.slowLoopStarted then
+        return
+    end
+
+    self.slowLoopStarted = true
+
     CreateThread(function()
         while ESX.PlayerLoaded do
             self:TrackPauseMenu()
@@ -213,10 +230,18 @@ function Actions:SlowLoop()
             self:TrackWeapon()
             Wait(500)
         end
+
+        self.slowLoopStarted = false
     end)
 end
 
 function Actions:PedLoop()
+    if self.pedLoopStarted then
+        return
+    end
+
+    self.pedLoopStarted = true
+
     CreateThread(function()
         while ESX.PlayerLoaded do
             local lastPed = ESX.PlayerData.ped
@@ -227,6 +252,8 @@ function Actions:PedLoop()
                 Wait(400)
             end
         end
+
+        self.pedLoopStarted = false
     end)
 end
 
@@ -235,5 +262,11 @@ function Actions:Init()
     self:PedLoop()
     self:TrackPedCoordsOnce()
 end
+
+ESX.SecureNetEvent("esx:onPlayerLogout", function()
+    Actions.slowLoopStarted = false
+    Actions.pedLoopStarted = false
+    Actions.coordsThreadPending = false
+end)
 
 Actions:Init()

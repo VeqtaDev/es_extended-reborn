@@ -1,4 +1,5 @@
 local pickups = {}
+local serverSyncLoopToken = 0
 
 RegisterNetEvent("esx:requestModel", function(model)
     ESX.Streaming.RequestModel(model)
@@ -312,6 +313,9 @@ end
 function StartServerSyncLoops()
     if Config.CustomInventory then return end
 
+    serverSyncLoopToken = serverSyncLoopToken + 1
+    local loopToken = serverSyncLoopToken
+
     local currentWeapon = {
         ---@type number
         ---@diagnostic disable-next-line: assign-type-mismatch
@@ -329,7 +333,7 @@ function StartServerSyncLoops()
     end
 
     CreateThread(function()
-        while ESX.PlayerLoaded do
+        while ESX.PlayerLoaded and loopToken == serverSyncLoopToken do
             currentWeapon.hash = GetSelectedPedWeapon(ESX.PlayerData.ped)
 
             if currentWeapon.hash ~= `WEAPON_UNARMED` then
@@ -338,7 +342,7 @@ function StartServerSyncLoops()
                 if weaponConfig then
                     currentWeapon.ammo = GetAmmoInPedWeapon(ESX.PlayerData.ped, currentWeapon.hash)
 
-                    while GetSelectedPedWeapon(ESX.PlayerData.ped) == currentWeapon.hash do
+                    while loopToken == serverSyncLoopToken and GetSelectedPedWeapon(ESX.PlayerData.ped) == currentWeapon.hash do
                         updateCurrentWeaponAmmo(weaponConfig.name)
                         Wait(1000)
                     end
@@ -354,13 +358,13 @@ function StartServerSyncLoops()
         local PARACHUTE_OPENING <const> = 1
         local PARACHUTE_OPEN <const> = 2
 
-        while ESX.PlayerLoaded do
+        while ESX.PlayerLoaded and loopToken == serverSyncLoopToken do
             local parachuteState = GetPedParachuteState(ESX.PlayerData.ped)
 
             if parachuteState == PARACHUTE_OPENING or parachuteState == PARACHUTE_OPEN then
                 TriggerServerEvent("esx:updateWeaponAmmo", "GADGET_PARACHUTE", 0)
 
-                while GetPedParachuteState(ESX.PlayerData.ped) ~= -1 do Wait(1000) end
+                while loopToken == serverSyncLoopToken and GetPedParachuteState(ESX.PlayerData.ped) ~= -1 do Wait(1000) end
             end
             Wait(500)
         end

@@ -11,7 +11,6 @@ USE `es_extended`;
 CREATE TABLE `users` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`identifier` VARCHAR(60) NOT NULL,
-	`ssn` VARCHAR(11) NOT NULL,
 	`accounts` LONGTEXT NULL DEFAULT NULL,
 	`group` VARCHAR(50) NULL DEFAULT 'user',
 	`inventory` LONGTEXT NULL DEFAULT NULL,
@@ -22,8 +21,7 @@ CREATE TABLE `users` (
 	`position` longtext NULL DEFAULT NULL,
 
 	PRIMARY KEY (`id`),
-	UNIQUE KEY `unique_identifier` (`identifier`),
-	UNIQUE KEY `unique_ssn` (`ssn`)
+	UNIQUE KEY `unique_identifier` (`identifier`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `items` (
