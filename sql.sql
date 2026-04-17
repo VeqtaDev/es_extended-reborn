@@ -49,23 +49,62 @@ CREATE TABLE `job_grades` (
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `job_grades` VALUES (1,'unemployed',0,'unemployed','Sans Emplois',200,'{}','{}');
-
 CREATE TABLE `jobs` (
 	`name` VARCHAR(50) NOT NULL,
 	`label` VARCHAR(50) DEFAULT NULL,
+	`type` VARCHAR(50) NOT NULL DEFAULT 'civ',
+	`whitelisted` TINYINT(1) NOT NULL DEFAULT 0,
 
 	PRIMARY KEY (`name`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `jobs` VALUES ('unemployed','Sans Emplois');
+INSERT INTO `jobs` (`name`, `label`, `type`, `whitelisted`) VALUES
+('ambulance', 'EMS', 'ems', 0),
+('cardealer', 'Concessionnaire', 'civ', 0),
+('fisherman', 'Pecheur', 'civ', 0),
+('fueler', 'Livreur Carburant', 'civ', 0),
+('lumberjack', 'Bucheron', 'civ', 0),
+('mechanic', 'Mecanicien', 'mechanic', 0),
+('miner', 'Mineur', 'civ', 0),
+('police', 'LSPD', 'leo', 0),
+('reporter', 'Journaliste', 'civ', 0),
+('slaughterer', 'Boucher', 'civ', 0),
+('tailor', 'Couturier', 'civ', 0),
+('taxi', 'Taxi', 'civ', 0),
+('unemployed', 'Sans Emplois', 'civ', 0);
+
+INSERT INTO `job_grades` (`id`, `job_name`, `grade`, `name`, `label`, `salary`, `skin_male`, `skin_female`) VALUES
+(1, 'unemployed', 0, 'unemployed', 'Sans Emplois', 200, '{}', '{}'),
+(2, 'police', 0, 'recruit', 'Recrue', 20, '{}', '{}'),
+(3, 'police', 1, 'officer', 'Officier', 40, '{}', '{}'),
+(4, 'police', 2, 'sergeant', 'Sergent', 60, '{}', '{}'),
+(5, 'police', 3, 'lieutenant', 'Lieutenant', 85, '{}', '{}'),
+(6, 'police', 4, 'boss', 'Capitaine', 100, '{}', '{}'),
+(11, 'cardealer', 0, 'recruit', 'Recrue', 10, '{}', '{}'),
+(12, 'cardealer', 1, 'novice', 'Novice', 25, '{}', '{}'),
+(13, 'cardealer', 2, 'experienced', 'Experimente', 40, '{}', '{}'),
+(14, 'cardealer', 3, 'boss', 'Patron', 0, '{}', '{}'),
+(15, 'lumberjack', 0, 'employee', 'Employe', 0, '{}', '{}'),
+(16, 'fisherman', 0, 'employee', 'Employe', 0, '{}', '{}'),
+(17, 'fueler', 0, 'employee', 'Employe', 0, '{}', '{}'),
+(18, 'reporter', 0, 'employee', 'Employe', 0, '{}', '{}'),
+(19, 'tailor', 0, 'employee', 'Employe', 0, '{}', '{}'),
+(20, 'miner', 0, 'employee', 'Employe', 0, '{}', '{}'),
+(21, 'slaughterer', 0, 'employee', 'Employe', 0, '{}', '{}'),
+(22, 'ambulance', 0, 'ambulance', 'EMT Junior', 20, '{}', '{}'),
+(23, 'ambulance', 1, 'doctor', 'EMT', 40, '{}', '{}'),
+(24, 'ambulance', 2, 'chief_doctor', 'EMT Senior', 60, '{}', '{}'),
+(25, 'ambulance', 3, 'boss', 'Superviseur EMS', 80, '{}', '{}'),
+(26, 'mechanic', 0, 'recrue', 'Recrue', 12, '{}', '{}'),
+(27, 'mechanic', 1, 'novice', 'Novice', 24, '{}', '{}'),
+(28, 'mechanic', 2, 'experimente', 'Experimente', 36, '{}', '{}'),
+(29, 'mechanic', 3, 'chief', 'Chef', 48, '{}', '{}'),
+(30, 'mechanic', 4, 'boss', 'Patron', 0, '{}', '{}'),
+(31, 'taxi', 0, 'recrue', 'Recrue', 12, '{}', '{}'),
+(32, 'taxi', 1, 'novice', 'Chauffeur', 24, '{}', '{}'),
+(33, 'taxi', 2, 'experimente', 'Experimente', 36, '{}', '{}'),
+(34, 'taxi', 3, 'uber', 'Chauffeur Uber', 48, '{}', '{}'),
+(35, 'taxi', 4, 'boss', 'Chauffeur Principal', 0, '{}', '{}');
 
 DELETE FROM `job_grades` WHERE `job_name` = 'banker';
 DELETE FROM `jobs` WHERE `name` = 'banker';
-
-UPDATE `jobs` SET `label` = 'Sans Emplois' WHERE `name` = 'unemployed';
-UPDATE `job_grades` SET `label` = 'Sans Emplois' WHERE `job_name` = 'unemployed';
-UPDATE `jobs` SET `label` = 'LSPD' WHERE `name` = 'police';
-UPDATE `job_grades` SET `label` = 'LSPD' WHERE `job_name` = 'police';
-UPDATE `jobs` SET `label` = 'EMS' WHERE `name` = 'ambulance';
-UPDATE `job_grades` SET `label` = 'EMS' WHERE `job_name` = 'ambulance';
