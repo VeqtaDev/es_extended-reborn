@@ -1,12 +1,12 @@
-CREATE DATABASE IF NOT EXISTS `es_extended`;
+CREATE DATABASE IF NOT EXISTS `esxreborn`;
 
-ALTER DATABASE `es_extended`
+ALTER DATABASE `esxreborn`
 	DEFAULT CHARACTER SET UTF8MB4;
 	
-ALTER DATABASE `es_extended`
+ALTER DATABASE `esxreborn`
 	DEFAULT COLLATE UTF8MB4_UNICODE_CI;
 
-USE `es_extended`;
+USE `esxreborn`;
 
 CREATE TABLE `users` (
 	`id` INT NOT NULL AUTO_INCREMENT,
@@ -105,3 +105,24 @@ INSERT INTO `job_grades` (`id`, `job_name`, `grade`, `name`, `label`, `salary`, 
 (33, 'taxi', 2, 'experimente', 'Experimente', 36, '{}', '{}'),
 (34, 'taxi', 3, 'uber', 'Chauffeur Uber', 48, '{}', '{}'),
 (35, 'taxi', 4, 'boss', 'Chauffeur Principal', 0, '{}', '{}');
+
+ALTER TABLE `users`
+	ADD COLUMN `firstname` VARCHAR(16) NULL DEFAULT NULL,
+	ADD COLUMN `lastname` VARCHAR(16) NULL DEFAULT NULL,
+	ADD COLUMN `dateofbirth` VARCHAR(10) NULL DEFAULT NULL,
+	ADD COLUMN `sex` VARCHAR(1) NULL DEFAULT NULL,
+	ADD COLUMN `height` INT NULL DEFAULT NULL
+;
+
+ALTER TABLE `users` ADD COLUMN `skin` LONGTEXT NULL DEFAULT NULL;
+
+
+CREATE TABLE `multicharacter_slots` (
+	`identifier` VARCHAR(60) NOT NULL,
+	`slots` INT(11) NOT NULL,
+	PRIMARY KEY (`identifier`) USING BTREE,
+	INDEX `slots` (`slots`) USING BTREE
+) ENGINE=InnoDB;
+
+ALTER TABLE `users` ADD COLUMN
+	`disabled` TINYINT(1) NULL DEFAULT '0';
